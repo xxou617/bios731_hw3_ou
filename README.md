@@ -4,7 +4,7 @@ Xiaxian Ou
 
 # Folder description
 
-*simulations*
+**simulations**
 
 `simulations/run_sim.sh`
 
@@ -20,14 +20,14 @@ Xiaxian Ou
 - saves results for each scenario in the  `results` folder
 
 
-`sim_evaluation.R`
+`simulations/sim_evaluation.R`
 
 - combine all results from the `results` folder
 - generates evaluation metrics.
 - save the evaluation results in `results`
 
 
-*source*
+**source**
 
 `source/01_simulate_data.R`
 
@@ -40,8 +40,12 @@ functions to calculate confidence interval by different methods
 - `standard_wald`: get Wald confidence intervals after input data
 - `boot_quantile`: implements nonparametric bootstrap percentile intervals (uses 1000 bootstrap samples in this homework).
 
+`source/03_summarise.R`
 
-*results*
+- combine results, time, params together
+
+
+**results**
 
 `/20250307/`
 
@@ -49,7 +53,7 @@ functions to calculate confidence interval by different methods
 - contains the overall evaluation results (evaluation.Rdata).
 
 
-*analysis*
+**analysis**
 
 - Rmarkdown file to analyze the simulation results
 - pdf file rendered from Rmarkdown
