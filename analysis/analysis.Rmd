@@ -1,0 +1,106 @@
+---
+title: 'Homework 3'
+header-includes:
+  - \usepackage{multirow}
+output:
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+# load libraries
+knitr::opts_chunk$set(tidy = FALSE, message = F, warning = F,
+                      fig.align = "center", fig.width = 6, fig.height = 3)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+load( here::here("results", "20250307", "evaluation.Rdata"))
+```
+
+Github link: [https://github.com/xxou617/bios731_hw3_ou](https://github.com/xxou617/bios731_hw3_ou)
+
+
+# 1. bias of $\hat{\beta}$
+
+```{r}
+evaluation_results |> distinct(bias, se_bias) |> 
+  ggplot(aes(x = factor(beta_true), y = bias, color = error_distribution)) +
+  geom_point(position = position_dodge(width = 0.3), size = 4) +  
+  geom_errorbar(aes(ymin = bias - se_bias, ymax = bias + se_bias), 
+                width = 0.2, position = position_dodge(width = 0.3)) +  
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") + 
+  labs(title = "Fig.1 Bias of Beta with Monte Carlo SE", 
+       x = "True Beta", 
+       y = "Bias",
+       color = "Error Distribution") +
+  theme_bw()
+  
+```
+
+
+# 2. Coverage of $\hat{\beta}$
+
+```{r,  fig.height = 5}
+evaluation_results |> 
+  ggplot(aes(x = factor(beta_true), y = coverage, color = method)) +
+  geom_point(position = position_dodge(width = 0.3), size = 4) +  
+  geom_errorbar(aes(ymin = coverage - se_coverage, ymax = coverage + se_coverage), 
+                width = 0.2, position = position_dodge(width = 0.3)) +  
+  geom_hline(yintercept = 0.95, linetype = "dashed", color = "black") + 
+  facet_grid(rows = vars(error_distribution)) +
+  labs(title = "Fig.2 Coverage of Beta with Monte Carlo SE", 
+       x = "True Beta", 
+       y = "Coverage",
+       color = "Error Distribution") +
+  theme_bw()
+```
+
+# 3. Power
+
+- H0: $\beta = 0$; H1: $\beta = 0.5$
+- Pr(reject H0| H1 true)
+
+```{r, fig.height = 3}
+evaluation_results |> 
+  filter(beta_true == 0.5) |> 
+  ggplot(aes(x = error_distribution, y = power, color = method)) +
+  geom_point(position = position_dodge(width = 0.3), size = 1.4) +  
+  geom_errorbar(aes(ymin = power - se_power, ymax = power + se_power), 
+                width = 0.2, position = position_dodge(width = 0.3)) +  
+  labs(title = "Fig.3 Power with Monte Carlo SE", 
+       x = "True Beta", 
+       y = "Power",
+       color = "Error Distribution") +
+  theme_bw()
+```
+
+
+# 4. Type 1 error
+
+- H0: $\beta = 0$; H1: $\beta = 0.5$
+- Pr(reject H0| H0 true)
+
+```{r}
+evaluation_results |> 
+  filter(beta_true == 0) |> 
+  ggplot(aes(x = error_distribution, y = type1.error, color = method)) +
+  geom_point(position = position_dodge(width = 0.3), size = 2) +  
+  geom_errorbar(aes(ymin = type1.error - se_type1.error, ymax = type1.error + se_type1.error), 
+                width = 0.2, position = position_dodge(width = 0.3)) + 
+   geom_hline(yintercept = 0.05, linetype = "dashed", color = "black") +
+  labs(title = "Fig.4 type 1 error with Monte Carlo SE", 
+       x = "True Beta", 
+       y = "type 1 error",
+       color = "Error Distribution") +
+  theme_bw()
+```
+
+
+The bias analysis (Fig. 1) shows that the estimates have minimal bias. When $\beta = 0$, the bias was similar for both distributions, though the normal distribution has slightly higher variability. When $\beta = 0.5$, the bias for the gamma distribution tended to be negative, making it does not include zero within its range. The coverage analysis (Fig. 2) shows that both Wald confidence intervals provided good coverage at the 0.95 level when errors followed a normal distribution, while the bootstrap method had  lower  coverage. However, under a gamma-distributed error structure, coverage dropped below the 95% threshold, except for the Wald method when $\beta = 0$. For power analysis (Fig. 3), the results suggest that power is low under the normal distribution, indicating a lower ability to detect the treatment effect. In contrast, power is higher under the gamma distribution. Wald method has lower power. For Type I error (Fig. 4), there is a trade-off between power and Type I error. The normal distribution had a lower Type I error, and the Wald method had Type I error close to the expected 0.05 level.
+
+
